@@ -12,6 +12,8 @@
 % the brain," in 2012 International Joint Conference on Neural Networks,
 % 2012. 
 
+warning off
+
 fprintf('Processing an fMRI data...\n');
 Y = bfn_readtable('bfn_dat_fmri_roi.txt');
 
@@ -39,3 +41,5 @@ drawnow
 set(gcf, 'Name', 'Nonfractal connectivity in fMRI data');
 
 fprintf(' DONE.\n');
+
+warning on
