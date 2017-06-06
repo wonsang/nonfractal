@@ -24,6 +24,8 @@ Seiffert, "Fractal analysis of resting state functional connectivity of
 the brain," in 2012 International Joint Conference on Neural Networks,
 2012. 
 
+https://sites.google.com/site/wsgyou/publications/ijcnn2012
+
 ## Information
 Please visit the webpage for more information:
 https://sites.google.com/site/wsgyou/research/restingstate
