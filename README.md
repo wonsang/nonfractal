@@ -26,5 +26,4 @@ the brain," in 2012 International Joint Conference on Neural Networks,
 
 ## Information
 Please visit the webpage for more information:
-
 https://sites.google.com/site/wsgyou/research/restingstate
