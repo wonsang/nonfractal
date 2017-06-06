@@ -15,3 +15,10 @@ It is a MATLAB toolbox for estimating nonfractal connectivity from a set of time
 
 ## Author 
 Wonsang You (wsgyou@gmail.com)
+
+## REFERENCE
+Please cite the following paper when using this toolbox.
+Wonsang You, Sophie Achard, Joerg Stadler, Bernd Bruekner, and Udo
+Seiffert, "Fractal analysis of resting state functional connectivity of
+the brain," in 2012 International Joint Conference on Neural Networks,
+2012. 
