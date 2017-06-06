@@ -18,6 +18,7 @@ This toolbox was designed to work from MATLAB version 7.7 (R2008b) to the latest
 
 ## Reference
 Please cite the following paper when using this toolbox.
+
 Wonsang You, Sophie Achard, Joerg Stadler, Bernd Bruekner, and Udo
 Seiffert, "Fractal analysis of resting state functional connectivity of
 the brain," in 2012 International Joint Conference on Neural Networks,
@@ -25,4 +26,5 @@ the brain," in 2012 International Joint Conference on Neural Networks,
 
 ## Information
 Please visit the webpage for more information:
+
 https://sites.google.com/site/wsgyou/research/restingstate
