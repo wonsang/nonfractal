@@ -19,15 +19,13 @@ This toolbox was designed to work from MATLAB version 7.7 (R2008b) to the latest
 ## Functions
 Let X be a NxQ matrix of Q time series with length N. It might be a set of BOLD signals corresponding to multiple ROIs of the brain which was extracted from DICOM images. Then, the function "bfn_mfin_ml" estimates the Hurst exponent and covariance matrix of short memory in multivariate time series using the maximum likelihood method as follows.
 
-[H, Omega] = bfn_mfin_ml(X);
+[H, nfcon] = bfn_mfin_ml(X);
 
-H is the Hurst exponent, and Omega is the covariance matrix of short memory. On the other hand, the function "bfn_mfin_lms" estimates them using the least-mean squares (LMS) method.
+H is the Hurst exponent, and nfcon is the nonfractal connectivity which is identical to the correlation matrix of short memory. On the other hand, the function "bfn_mfin_lms" estimates the nonfractal connectivity using the least-mean squares (LMS) method.
 
 [H, Omega] = bfn_mfin_lms(X);
 
-For more options, run the commands "help bfn_mfin_ml" or "help bfn_mfin_lms". The nonfractal connectivity is then obtained by converting the covariance matrix into the corresponding correlation matrix.
-
-cor = bfn_CovToCor(Omega);
+For more options, run the commands "help bfn_mfin_ml" or "help bfn_mfin_lms".
 
 
 ## Reference

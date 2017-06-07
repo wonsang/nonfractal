@@ -1,8 +1,8 @@
-function [H, Omega, att] = bfn_mfin_ml(X, varargin)
+function [H, cor, att] = bfn_mfin_ml(X, varargin)
 % BFN_MFIN_ML Univariate maximum likelihood estimation for a multivariate fractionally integrated noise
 %
 % Syntax:
-%   [H, Omega, att] = bfn_mfin_ml(X, 'Property Name 1','Property value 1',...)
+%   [H, cor, att] = bfn_mfin_ml(X, 'Property Name 1','Property value 1',...)
 %
 % Description:
 %   It estimates the Hurst exponent and covariance matrix of a
@@ -46,7 +46,7 @@ function [H, Omega, att] = bfn_mfin_ml(X, varargin)
 %
 % Output Arguments:
 %   H - the Hurst exponent
-%   Omega - the covariance matrix of short memory
+%   cor - the correlation matrix of short memory
 %   att - the list of estimator attributes
 %
 %__________________________________________________________________________
@@ -246,6 +246,7 @@ switch params.omegamode
 end
 
 H = d+.5;
+cor = bfn_CovToCor(Omega);
 att = struct('method'   ,params.method,...
             'wavelet'   ,params.wavelet,...
             'range'     ,params.range,...
