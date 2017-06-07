@@ -1,4 +1,4 @@
-%% Estimation of nonfractal connectivity by simulation studies
+%% Estimation of nonfractal connectivity from fMRI signals
 % This demo shows an example of estimating nonfractal connectivity of
 % an fMRI BOLD signals of the brain.
 % We applied the ML-LIN estimator to a resting state fMRI data of the rat
