@@ -27,7 +27,7 @@ Y = bfn_readtable('bfn_dat_fmri_roi.txt');
 C_FMRI      = corr(Y') - eye(15);
 
 fprintf('Creating plots...\n');
-figure('position',[100 100 450 450]);
+figure('position',[100 100 1350 450]);
 colormap Jet
 
 subplot(1,3,1); imagesc(NFCON_FMRI,[0 1]);
