@@ -27,7 +27,7 @@ H is the Hurst exponent, nfcon and fcon denote the nonfractal connectivity and f
 
 > [H, nfcon, fcon] = bfn_mfin_lms(X);
 
-For more options, run the commands "help bfn_mfin_ml" or "help bfn_mfin_lms".
+For more options, run the commands "`help bfn_mfin_ml`" or "`help bfn_mfin_lms`".
 
 ## Reference
 Please cite the following paper when using this toolbox.
