@@ -25,7 +25,7 @@ H is the Hurst exponent, and Omega is the covariance matrix of short memory. On 
 
 [H, Omega] = bfn_mfin_lms(X);
 
-The nonfractal connectivity is then obtained by converting the Convariance matrix into the corresponding correlation matrix.
+For more options, run the commands "help bfn_mfin_ml" or "help bfn_mfin_lms". The nonfractal connectivity is then obtained by converting the Convariance matrix into the corresponding correlation matrix.
 
 cor = bfn_CovToCor(Omega);
 
