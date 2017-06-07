@@ -23,7 +23,7 @@ Let X be a NxQ matrix of Q time series with length N. It might be a set of BOLD 
 
 H is the Hurst exponent, and nfcon is the nonfractal connectivity which is identical to the correlation matrix of short memory. On the other hand, the function "bfn_mfin_lms" estimates the nonfractal connectivity using the least-mean squares (LMS) method.
 
-[H, Omega] = bfn_mfin_lms(X);
+[H, nfcon] = bfn_mfin_lms(X);
 
 For more options, run the commands "help bfn_mfin_ml" or "help bfn_mfin_lms".
 
