@@ -17,16 +17,13 @@ This toolbox was designed to work from MATLAB version 7.7 (R2008b) to the latest
 3. Try to run the demo script "bfn_demo_nonfractal". This demo shows an example of estimating nonfractal connectivity of resting state fMRI BOLD signals of the rat brain using the maximum likelihood estimator.
 
 ## Functions
-Let X be a NxQ matrix of Q time series with length N. It might be a set of BOLD signals corresponding to multiple ROIs of the brain which was extracted from DICOM images. Then, the function "bfn_mfin_ml" estimates both the Hurst exponent and correlation matrix of short memory in multivariate time series using the maximum likelihood method as follows.
+Let X be a NxQ matrix of Q time series with length N. It might be a set of BOLD signals corresponding to multiple ROIs of the brain which was extracted from DICOM images. Then, the function "bfn_mfin_ml" estimates the Hurst exponent, nonfractal connectivity, and fractal connectivity in multivariate time series with long memory using the maximum likelihood method as follows.
 
-[H, nfcon] = bfn_mfin_ml(X);
+[H, nfcon, fcon] = bfn_mfin_ml(X);
 
-H is the Hurst exponent, and nfcon is the nonfractal connectivity which is identical to the correlation matrix of short memory. On the other hand, the function "bfn_mfin_lms" estimates the nonfractal connectivity using the least-mean squares (LMS) method.
+H is the Hurst exponent, nfcon and fcon denote the nonfractal connectivity and fractal connectivity respectively. Nonfractal connectivity is identical to the correlation matrix of short memory while fractal connectivity is defined as the asymptotic wavelet correlation of bivariate long memory processes. On the other hand, the function "bfn_mfin_lms" uses the least-mean squares (LMS) method to estimate all the above parameters.
 
-[H, nfcon] = bfn_mfin_lms(X);
-
-For more options, run the commands "help bfn_mfin_ml" or "help bfn_mfin_lms".
-
+[H, nfcon, fcon] = bfn_mfin_lms(X);
 
 ## Reference
 Please cite the following paper when using this toolbox.

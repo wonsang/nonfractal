@@ -1,8 +1,8 @@
-function [H, cor, att] = bfn_mfin_lms(X, varargin)
+function [H, nfcor, fcor, att] = bfn_mfin_lms(X, varargin)
 % BFN_MFIN_LMS  Univariate LMS estimation of a multivariate fractionally integrated noise
 %
 % Syntax:
-%   [H, cor, att] = bfn_mfin_lms(X, 'Property Name 1','Property value 1',...)
+%   [H, nfcor, fcor, att] = bfn_mfin_lms(X, 'Property Name 1','Property value 1',...)
 %
 % Description:
 %   It estimates the Hurst exponent and covariance matrix of a
@@ -47,13 +47,14 @@ function [H, cor, att] = bfn_mfin_lms(X, varargin)
 %                   if isplot equal to 0. Default is 1.
 %
 % Output Arguments:
-%   H - the Hurst exponent
-%   cor - the correlation matrix of short memory
-%   att - the list of estimator attributes
+%   H     - the Hurst exponent
+%   nfcor - the correlation matrix of short memory
+%   fcor  - the asymptotic wavelet correlation
+%   att   - the list of estimator attributes
 %
 % Examples:
-%   [H, Omega, att] = bfn_mfin_lms(x,'method','LN','range',[1 100],...
-%                    'wavelet','modwt','filter','la8');
+%   [H, nfcor, fcor, att] = bfn_mfin_lms(x,'method','US','range',[1 100],...
+%                    'wavelet','dwt','filter','la8');
 %
 % References:
 %   Achard, S., Bassett, D. S., Meyer-Lindenberg, A., & Bullmore, E.
@@ -313,7 +314,8 @@ switch params.method
 end
 
 H = d+.5;
-cor = bfn_CovToCor(Omega);
+nfcor = bfn_CovToCor(Omega);
+fcor  = bfn_acorr(H, Omega);
 att = struct('method'       ,params.method,...
             'wavelet'       ,params.wavelet,...
             'range'         ,params.range,...
