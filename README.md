@@ -17,7 +17,7 @@ This toolbox was designed to work from MATLAB version 7.7 (R2008b) to the latest
 3. Try to run the demo script "bfn_demo_nonfractal". This demo shows an example of estimating nonfractal connectivity of resting state fMRI BOLD signals of the rat brain using the maximum likelihood estimator.
 
 ## Functions
-Let X be a NxQ matrix of Q time series with length N. It might be a set of BOLD signals corresponding to multiple ROIs of the brain which was extracted from DICOM images. Then, the function "bfn_mfin_ml" estimates the Hurst exponent and covariance matrix of short memory in multivariate time series using the maximum likelihood method as follows.
+Let X be a NxQ matrix of Q time series with length N. It might be a set of BOLD signals corresponding to multiple ROIs of the brain which was extracted from DICOM images. Then, the function "bfn_mfin_ml" estimates both the Hurst exponent and correlation matrix of short memory in multivariate time series using the maximum likelihood method as follows.
 
 [H, nfcon] = bfn_mfin_ml(X);
 
