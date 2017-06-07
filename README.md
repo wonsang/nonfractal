@@ -1,7 +1,7 @@
-# nonfractal: MATLAB Toolbox for estimating nonfractal connectivity 
+# nonfractal: MATLAB Toolbox for estimating nonfractal connectivity and fractal connectivity
 
 ## Description 
-It is a MATLAB toolbox for estimating both nonfractal connectivity and fractal connectivity from a set of time series such as resting state fMRI BOLD signals.
+It is a MATLAB toolbox for estimating both nonfractal connectivity and fractal connectivity from a set of time series with long-range dependence such as resting state fMRI BOLD signals.
 
 ## Depends 
 * Statistics Toolbox
