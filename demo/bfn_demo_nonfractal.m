@@ -17,7 +17,7 @@ warning off
 fprintf('Processing an fMRI data...\n');
 Y = bfn_readtable('bfn_dat_fmri_roi.txt');
 
-[H_FMRI, Omega_FMRI] = bfn_mfin_ml(Y', ...         
+[H_FMRI, R_FMRI] = bfn_mfin_ml(Y', ...         
                     'range'     ,[2 100],...
                     'abstol'    ,1e-10,...
                     'maxit'     ,100,...
@@ -25,7 +25,6 @@ Y = bfn_readtable('bfn_dat_fmri_roi.txt');
                     'verbose'   ,0);
 
 C_FMRI      = corr(Y') - eye(15);
-R_FMRI      = bfn_CovToCor(Omega_FMRI);
 
 fprintf('Creating plots...\n');
 figure('position',[100 100 450 450]);
