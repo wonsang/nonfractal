@@ -16,6 +16,20 @@ This toolbox was designed to work from MATLAB version 7.7 (R2008b) to the latest
 2. The wmtsa toolbox should be installed a priori. It can be downloaded from http://www.atmos.washington.edu/~wmtsa/ for free.
 3. Try to run the demo script "bfn_demo_nonfractal".
 
+## Functions
+Let X be a NxQ matrix of Q time series with length N. Then, the function "bfn_mfin_ml" estimates the Hurst exponent and covariance matrix of short memory in multivariate time series using the maximum likelihood method as follows.
+
+[H, Omega] = bfn_mfin_ml(X);
+
+H is the Hurst exponent, and Omega is the covariance matrix of short memory. On the other hand, the function "bfn_mfin_lms" estimates them using the least-mean squares (LMS) method.
+
+[H, Omega] = bfn_mfin_lms(X);
+
+The nonfractal connectivity is then obtained by converting the Convariance matrix into the corresponding correlation matrix.
+
+cor = bfn_CovToCor(Omega);
+
+
 ## Reference
 Please cite the following paper when using this toolbox.
 
