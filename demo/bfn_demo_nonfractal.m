@@ -15,7 +15,7 @@
 warning off
 
 fprintf('Processing an fMRI data...\n');
-Y = bfn_readtable('bfn_dat_fmri_roi.txt');
+Y = bfn_readtable('rsfmri.txt');
 
 [H_FMRI, NFCON_FMRI, FCON_FMRI] = bfn_mfin_ml(Y', ...         
                     'range'     ,[2 100],...
