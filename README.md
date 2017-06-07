@@ -45,5 +45,5 @@ https://sites.google.com/site/wsgyou/research/restingstate
 Please leave a post to give any question or to report technical issues in the following webpage.
 https://www.nitrc.org/forum/?group_id=1181
 
-You can also send an e-mail to the mailing list to get technical help.
+You can also send an e-mail to nonfractal-commits@www.nitrc.org after subscribing the mailing list.
 http://www.nitrc.org/mailman/listinfo/nonfractal-commits
