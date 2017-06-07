@@ -17,7 +17,7 @@ warning off
 fprintf('Processing an fMRI data...\n');
 Y = bfn_readtable('bfn_dat_fmri_roi.txt');
 
-[H_FMRI, R_FMRI] = bfn_mfin_ml(Y', ...         
+[H_FMRI, NFCON_FMRI, FCON_FMRI] = bfn_mfin_ml(Y', ...         
                     'range'     ,[2 100],...
                     'abstol'    ,1e-10,...
                     'maxit'     ,100,...
@@ -30,15 +30,18 @@ fprintf('Creating plots...\n');
 figure('position',[100 100 450 450]);
 colormap Jet
 
-subplot(1,2,1); imagesc(R_FMRI,[0 1]);
+subplot(1,3,1); imagesc(NFCON_FMRI,[0 1]);
 title('Nonfractal connectivity (fMRI)'  ,'FontSize',10); set(gca,'PlotBoxAspectRatio',[1.2 1 1])
 
-subplot(1,2,2); imagesc(C_FMRI,[0 1]);
+subplot(1,3,2); imagesc(FCON_FMRI,[0 1]);
+title('Fractal connectivity (fMRI)'  ,'FontSize',10); set(gca,'PlotBoxAspectRatio',[1.2 1 1])
+
+subplot(1,3,3); imagesc(C_FMRI,[0 1]);
 title('Pearson correlation (fMRI)'      ,'FontSize',10); set(gca,'PlotBoxAspectRatio',[1.2 1 1])
 
 drawnow
-set(gcf, 'Name', 'Nonfractal connectivity in fMRI data');
+set(gcf, 'Name', 'Fractal analysis in fMRI data');
 
-fprintf(' DONE.\n');
+fprintf('DONE.\n');
 
 warning on
