@@ -13,11 +13,11 @@ function [H, Omega, att] = bfn_mfin_ml(X, varargin)
 %   X : a matrix of multiple time series
 %   
 % Options:
-%   method - the estimation method. Default is 'LN'.
+%   method - the estimation method. Default is 'ML'.
 %     'ML' - the standard ML method
 %     'MR' - the reduced ML method
 %   range - a vector of scale range. Default is [1 100].
-%   wavelet - the type of wavelets. Default is 'modwt'.
+%   wavelet - the type of wavelets. Default is 'dwt'.
 %     'dwt' - discrete wavelet transform
 %   boundary - the mode of boundary coefficients. Default is 'periodic'.
 %   filter - The mode of wavelet filter. The list of filter
@@ -37,7 +37,7 @@ function [H, Omega, att] = bfn_mfin_ml(X, varargin)
 %   init - the initial vector for maximum likelihood estimation.
 %   lb - the two-element vector for the lower bound
 %   ub - the two-element vector for the upper bound
-%   omegamode - the covariance computation mode.
+%   omegamode - the covariance computation mode. Default is 'cov'.
 %     'lin' - based on the linearity of wavelet covariances
 %     'sdf' - based on the spectral density.
 %     'cov' - based on the covariance.

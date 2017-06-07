@@ -16,7 +16,7 @@ function [H, Omega, att] = bfn_mfin_lms(X, varargin)
 %   method - the estimation method. Default is 'US'.
 %     'US' - the univariate LMS method
 %   range - a vector of scale range. Default is [1 100].
-%   wavelet - the type of wavelets. Default is 'modwt'.
+%   wavelet - the type of wavelets. Default is 'dwt'.
 %     'dwt' - discrete wavelet transform
 %   filter - The mode of wavelet filter. The list of filter
 %            modes are shown below. Default is 'la8'.
@@ -37,7 +37,7 @@ function [H, Omega, att] = bfn_mfin_lms(X, varargin)
 %   maxerr - the maximum allowance of LMS error. Default is 1e-2.
 %   discardCor - whether to discard the scale correlation from LMS
 %                   factors. Default is 0.
-%   omegamode - the covariance computation mode.
+%   omegamode - the covariance computation mode. Default is 'sdf'.
 %     'lin' - based on the linearity of wavelet covariances
 %     'sdf' - based on the spectral density.
 %     'cov' - based on the covariance.
