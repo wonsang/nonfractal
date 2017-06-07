@@ -40,3 +40,10 @@ https://sites.google.com/site/wsgyou/publications/ijcnn2012
 ## Information
 Please visit the webpage for more information:
 https://sites.google.com/site/wsgyou/research/restingstate
+
+## Technical supports
+Please leave a post to give any question or to report technical issues in the following webpage.
+https://www.nitrc.org/forum/?group_id=1181
+
+You can also send an e-mail to the mailing list to get technical help.
+http://www.nitrc.org/mailman/listinfo/nonfractal-commits
