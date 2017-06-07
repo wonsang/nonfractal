@@ -13,7 +13,7 @@ Wonsang You (wsgyou@gmail.com)
 ## Getting Started
 This toolbox was designed to work from MATLAB version 7.7 (R2008b) to the latest version with the Statistics toolbox. You can install this toolbox as follows.
 1. Place all files of this toolbox at any directory, and add all sub-directories to the MATLAB paths.
-2. The wmtsa toolbox should be installed a priori. It can be downloaded from http://www.atmos.washington.edu/~wmtsa/ for free.
+2. The wmtsa toolbox should be installed a priori. It can be downloaded from the [WMTSA toolkit website](http://www.atmos.washington.edu/~wmtsa/) for free.
 3. Try to run the demo script "`bfn_demo_nonfractal`". This demo shows an example of estimating nonfractal connectivity of resting state fMRI BOLD signals of the rat brain using the maximum likelihood estimator.
 
 ![Nonfractal connectivity and fractal connectivity](/demo/demo.png)
