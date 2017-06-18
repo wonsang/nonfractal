@@ -77,7 +77,13 @@ params = struct('method'        ,'US',...
                 'omegamode'     ,'sdf',...
                 'verbose'       ,1,...
                 'isplot'        ,0);
-params = bfn_parseArgs(varargin,params);
+if nargin > 1
+    if iscell(varargin{1})
+        params = bfn_parseArgs(varargin{1},params);
+    else
+        params = bfn_parseArgs(varargin,params);
+    end
+end
 
 N  = size(X,1);
 Q  = size(X,2);
