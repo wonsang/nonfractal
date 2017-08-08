@@ -1,5 +1,11 @@
 Release Notes
 
+Version 1.4 (08-08-2017)
+* Added a function bfn_trim_nonchar.
+
+Version 1.3 (06-17-2017)
+* Fixed a minor error.
+
 Version 1.2 (06-07-2017)
 * Enabled fractal connectivity.
 
