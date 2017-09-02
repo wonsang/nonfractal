@@ -36,7 +36,7 @@ Please cite the following paper when using this toolbox.
 
 ## Information
 * Please visit the [project website](https://sites.google.com/site/wsgyou/research/restingstate) for more information.
-* You can also view the [educational slides](https://figshare.com/articles/Long_memory_model_of_resting_state_functional_MRI/5371048).
+* You can also view the [educational slides](https://www.slideshare.net/lovebridge/longmemory-79365155).
 
 ## Technical supports
 * Please leave a post to give any question or to report technical issues in the [NITRC forum](https://www.nitrc.org/forum/?group_id=1181).
