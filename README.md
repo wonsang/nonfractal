@@ -35,7 +35,8 @@ Please cite the following paper when using this toolbox.
 > Wonsang You, Sophie Achard, Joerg Stadler, Bernd Bruekner, and Udo Seiffert, "[Fractal analysis of resting state functional connectivity of the brain](https://sites.google.com/site/wsgyou/publications/ijcnn2012)," in 2012 International Joint Conference on Neural Networks, 2012. 
 
 ## Information
-Please visit the [project website](https://sites.google.com/site/wsgyou/research/restingstate) for more information.
+* Please visit the [project website](https://sites.google.com/site/wsgyou/research/restingstate) for more information.
+* You can also view the [educational slides](https://figshare.com/articles/Long_memory_model_of_resting_state_functional_MRI/5371048).
 
 ## Technical supports
 * Please leave a post to give any question or to report technical issues in the [NITRC forum](https://www.nitrc.org/forum/?group_id=1181).
