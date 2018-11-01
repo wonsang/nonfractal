@@ -282,7 +282,7 @@ function [d, sigma] = fin_ml(wsum, va, N, NJ, range, params)
 
     % iteration
     it = 1;
-    sigold2 = signew2/(1-params.abstol)+10;   %signew2+params.abstol+10;                    
+    sigold2 = signew2/(1-params.abstol)+10;                    
     while ((abs(1-signew2/sigold2)>params.abstol)) && (it<=params.maxit) 
         sigold2 = signew2;
         if isempty(params.options)
