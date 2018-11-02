@@ -19,6 +19,7 @@ function [H, nfcor, fcor, att] = bfn_mfin_ml(X, varargin)
 %   range - a vector of scale range. Default is [1 100].
 %   wavelet - the type of wavelets. Default is 'dwt'.
 %     'dwt' - discrete wavelet transform
+%     'modwt' - maximal overlap discrete wavelet transform
 %   boundary - the mode of boundary coefficients. Default is 'periodic'.
 %   filter - The mode of wavelet filter. The list of filter
 %            modes are shown below. Default is 'la8'.
@@ -41,6 +42,7 @@ function [H, nfcor, fcor, att] = bfn_mfin_ml(X, varargin)
 %     'lin' - based on the linearity of wavelet covariances
 %     'sdf' - based on the spectral density.
 %     'cov' - based on the covariance.
+%   d_only - only estimate the Hurst exponents (H).
 %   verbose - whether to display the text messages during
 %                   processing. Default is 1.
 %
@@ -55,6 +57,7 @@ function [H, nfcor, fcor, att] = bfn_mfin_ml(X, varargin)
 % $ Id: bfn_mfin_ml.m 0028 2013-03-12 00:13:18 brainfnet $
 % Copyright (c) 2011 Brainfnet.
 
+warning('off','all')
  
 params = struct('method'    ,'ML',...
                 'wavelet'   ,'dwt',...
@@ -68,6 +71,7 @@ params = struct('method'    ,'ML',...
                 'ub'        ,[0.5 10],...
                 'options'   ,[],...
                 'omegamode' ,'cov',...
+                'd_only'    ,0,...
                 'verbose'   ,1);
 if nargin > 1
     if iscell(varargin{1})
@@ -89,6 +93,7 @@ switch params.wavelet
         x_dwt = dwt(X(:,1), params.filter, 'conservative', params.boundary);
         x_bw  = bfn_dwt_brick_wall(x_dwt, params.filter, N);
         J     = length(x_bw);
+        W     = cell(1,J);
         for j=1:J
             NJ(j) = length(x_bw{j});
             W{j}(1:NJ(j),1) = x_bw{j};
@@ -101,18 +106,44 @@ switch params.wavelet
                 W{j}(1:NJ(j),q) = x_bw{j};
             end
         end 
+        
+    case 'modwt'
+        
+        x_dwt = modwt(X(:,1), params.filter, 'conservative', 'circular');
+        
+        N     = size(x_dwt,1);
+        J     = size(x_dwt,2);
+        
+        Jmax  = floor(log2(size(X,1)));
+        NJ    = 2.^(Jmax-1:-1:Jmax-J);
+        
+        x_bw  = bfn_modwt_brick_wall(x_dwt, params.filter, N);
+
+        W = cell(1,J);
+        for j=1:J
+            W{j} = zeros(N,Q);
+            W{j}(:,1) = squeeze(x_bw(:,j));  
+        end
+        
+        for q=2:Q
+            x_dwt = modwt(X(:,q), params.filter, 'conservative', 'circular');
+            x_bw  = bfn_modwt_brick_wall(x_dwt, params.filter, N);
+            for j=1:J
+                W{j}(:,q) = squeeze(x_bw(:,j));
+            end
+        end 
 
     otherwise
 end
 
-J1    = params.range(1);
+J1    = max(1,params.range(1));
 J2    = min(J,params.range(2));  
 range = [J1, J2];
 Js    = J1:J2;
 
 %% wavelet variances
 switch params.wavelet
-    case {'dwt','dwt-ext'}
+    case {'dwt'}
         switch params.omegamode
             case 'sdf'
                 wsum = zeros(J,Q,Q);
@@ -121,20 +152,23 @@ switch params.wavelet
                         W1 = getWq(W,q1);
                         W2 = getWq(W,q2);
 
-                        wsum(:,q1,q2) = bfn_wave_sum_dwt(W1, W2);
+                        wsum(:,q1,q2) = abs(bfn_wave_sum_dwt(W1, W2));
                         wsum(:,q2,q1) = wsum(:,q1,q2);
                     end
                 end
             case 'lin'
-                wcov = zeros(J,Q,Q);
-                for q1 = 1:Q
-                    for q2 = q1:Q
-                        W1 = getWq(W,q1);
-                        W2 = getWq(W,q2);
-                        wcov(:,q1,q2) = bfn_wave_cov_dwt(W1, W2);
-                        wcov(:,q2,q1) = wcov(:,q1,q2);
-                    end
-                end  
+                
+                if ~params.d_only
+                    wcov = zeros(J,Q,Q);
+                    for q1 = 1:Q
+                        for q2 = q1:Q
+                            W1 = getWq(W,q1);
+                            W2 = getWq(W,q2);
+                            wcov(:,q1,q2) = bfn_wave_cov_dwt(W1, W2);
+                            wcov(:,q2,q1) = wcov(:,q1,q2);
+                        end
+                    end  
+                end
 
                 wsum = zeros(J,Q);
                 for q = 1:Q
@@ -146,17 +180,84 @@ switch params.wavelet
                 wsum = zeros(J,Q);
                 for q = 1:Q
                     W1 = getWq(W,q);
-                    wsum(:,q) = bfn_wave_sum_dwt(W1, W1);
+                    wsum(:,q) = abs(bfn_wave_sum_dwt(W1, W1));
                 end
                 
+                if ~params.d_only
+                    wsum2 = zeros(J,Q,Q);
+                    for q1 = 1:Q
+                        for q2 = q1:Q
+                            W1 = getWq(W,q1);
+                            W2 = getWq(W,q2);
+
+                            wsum2(:,q1,q2) = abs(bfn_wave_sum_dwt(W1, W2));
+                            wsum2(:,q2,q1) = wsum2(:,q1,q2);
+                        end
+                    end
+                end
+        end
+        
+    case {'modwt'}
+        
+        switch params.omegamode
+            case 'sdf'
+                wsum = zeros(J,Q);
                 wsum2 = zeros(J,Q,Q);
                 for q1 = 1:Q
-                    for q2 = q1:Q
-                        W1 = getWq(W,q1);
-                        W2 = getWq(W,q2);
-
-                        wsum2(:,q1,q2) = bfn_wave_sum_dwt(W1, W2);
-                        wsum2(:,q2,q1) = wsum2(:,q1,q2);
+                    W1 = getWq(W,q1);
+                    W1 = cell2mat(W1);
+                    wsum2(:,q1,q1) = modwt_wvar(W1,'gaussian','unbiased',params.filter);
+                    wsum(:,q1) = wsum2(:,q1,q1);
+                    
+                    if ~params.d_only
+                        for q2 = q1:Q
+                            if q1 ~= q2
+                                W2 = getWq(W,q2);
+                                W2 = cell2mat(W2);
+                                wsum2(:,q1,q2) = modwt_wcov(W1, W2,'gaussian','unbiased',params.filter);
+                                wsum2(:,q2,q1) = wsum2(:,q1,q2);
+                            end
+                        end
+                    end
+                end
+            case 'lin'
+                wsum = zeros(J,Q);
+                wcov = zeros(J,Q,Q);
+                for q1 = 1:Q
+                    W1 = getWq(W,q1);
+                    W1 = cell2mat(W1);
+                    wcov(:,q1,q1) = modwt_wvar(W1,'gaussian','unbiased',params.filter);
+                    wsum(:,q1) = wcov(:,q1,q1);
+                    
+                    if ~params.d_only
+                        for q2 = q1:Q
+                            if q1 ~= q2
+                                W2 = getWq(W,q2);
+                                W2 = cell2mat(W2);
+                                wcov(:,q1,q2) = modwt_wcov(W1, W2,'gaussian','unbiased',params.filter);
+                                wcov(:,q2,q1) = wcov(:,q1,q2);
+                            end
+                        end
+                    end
+                end
+            case 'cov'
+                wsum = zeros(J,Q);
+                wsum2 = zeros(J,Q,Q);
+                for q1 = 1:Q
+                    W1 = getWq(W,q1);
+                    W1 = cell2mat(W1);
+                    wsum2(:,q1,q1) = modwt_wvar(W1,'gaussian','unbiased',params.filter);
+                    wsum(:,q1) = wsum2(:,q1,q1);
+                    
+                    if ~params.d_only
+                        for q2 = q1:Q
+                            if q1 ~= q2
+                                W2 = getWq(W,q2);
+                                W2 = cell2mat(W2);
+                                wsum2(:,q1,q2) = modwt_wcov(W1, W2,'gaussian','unbiased',params.filter);
+                                wsum2(:,q2,q1) = wsum2(:,q1,q2);
+                            end
+                        end
                     end
                 end
         end
@@ -169,12 +270,7 @@ d = zeros(1,Q);
 switch params.method
     case 'ML'            
         for q = 1:Q
-            switch params.omegamode
-                case 'sdf'
-                    ws = squeeze(wsum(:,q,q));
-                otherwise
-                    ws = squeeze(wsum(:,q));
-            end
+            ws = squeeze(wsum(:,q));
 
             va = var(X(:,q));
             d(q) = fin_ml(ws, va, N, NJ, range, params);
@@ -186,12 +282,7 @@ switch params.method
 
     case 'MR'
         for q = 1:Q
-            switch params.omegamode
-                case 'sdf'
-                    ws = squeeze(wsum(:,q,q));
-                otherwise
-                    ws = squeeze(wsum(:,q));
-            end
+            ws = squeeze(wsum(:,q));
 
             va = var(X(:,q));
             d(q) = fin_mr(ws, va, N, NJ, range, params);
@@ -204,51 +295,58 @@ switch params.method
     otherwise
 end
 
+H = d+.5;
+
 %% compute short memory covariance
-switch params.omegamode
-    case 'lin'
-        C = zeros(Q,Q);             
-        for i = 1:Q
-            for j=i:Q
-                lwc = log2(abs(squeeze(wcov(Js,i,j))));
-                C(i,j) = mean(lwc' - (d(i)+d(j))*Js);
-                C(j,i) = C(i,j);
+if ~params.d_only
+    switch params.omegamode
+        case 'lin'
+            C = zeros(Q,Q);             
+            for i = 1:Q
+                for j=i:Q
+                    lwc = log2(abs(squeeze(wcov(Js,i,j))));
+                    C(i,j) = mean(lwc' - (d(i)+d(j))*Js);
+                    C(j,i) = C(i,j);
+                end
             end
-        end
-        Omega = bfn_getsigma_m(d,C);
+            Omega = bfn_getsigma_m(d,C);
 
-    case 'cov'
-        %Xcov = cov(X);             
-        Omega = zeros(Q);
-        for i = 1:Q
-            for j=i:Q
-                B1 = (1 - 2.^(d(i)+d(j)-1))./(1-d(i)-d(j)); 
-                ws = squeeze(wsum2(:,i,j))';
-                xcov = sum(ws(Js)./2.^Js)/N;    
-                Omega(i,j) = xcov/(2*B1*cos(pi/2*(d(i)-d(j)))*(2*pi)^(1-d(i)-d(j))*sum(2.^((d(i)+d(j)-1)*Js)));
-                %Omega(i,j) = Xcov(i,j)/(2*B1*(2*pi)^(1-d(i)-d(j))*sum(2.^((d(i)+d(j)-1)*(1:10))));
-                Omega(j,i) = Omega(i,j);
+        case 'cov'
+            %Xcov = cov(X);             
+            Omega = zeros(Q);
+            for i = 1:Q
+                for j=i:Q
+                    B1 = (1 - 2.^(d(i)+d(j)-1))./(1-d(i)-d(j)); 
+                    ws = squeeze(wsum2(:,i,j))';
+                    xcov = sum(ws(Js)./2.^Js)/N;    
+                    Omega(i,j) = xcov/(2*B1*cos(pi/2*(d(i)-d(j)))*(2*pi)^(1-d(i)-d(j))*sum(2.^((d(i)+d(j)-1)*Js)));
+                    %Omega(i,j) = Xcov(i,j)/(2*B1*(2*pi)^(1-d(i)-d(j))*sum(2.^((d(i)+d(j)-1)*(1:10))));
+                    Omega(j,i) = Omega(i,j);
+                end
             end
-        end
-    case 'sdf'
-        wsteps = J;
-        wsize  = N - N/2^wsteps;
+        case 'sdf'
+            wsteps = J;
+            wsize  = N - N/2^wsteps;
 
-        Omega = zeros(Q);
-        for i = 1:Q
-            for j=i:Q
-                sdf = bfn_finsdf_b(d(i),d(j),[1,J],NaN);
-                ws = squeeze(wsum(:,i,j));
-                Omega(i,j) = sum(ws(1:J)./sdf)/wsize; 
-                Omega(j,i) = Omega(i,j);
-            end
-        end     
-    otherwise
+            Omega = zeros(Q);
+            for i = 1:Q
+                for j=i:Q
+                    sdf = bfn_finsdf_b(d(i),d(j),[1,J],NaN);
+                    ws = squeeze(wsum2(:,i,j));
+                    Omega(i,j) = sum(ws(1:J)./sdf)/wsize; 
+                    Omega(j,i) = Omega(i,j);
+                end
+            end     
+        otherwise
+    end
+    
+    nfcor = bfn_CovToCor(Omega);
+    fcor  = bfn_acorr(H, Omega);
+else
+    nfcor = [];
+    fcor  = [];
 end
 
-H = d+.5;
-nfcor = bfn_CovToCor(Omega);
-fcor  = bfn_acorr(H, Omega);
 att = struct('method'   ,params.method,...
             'wavelet'   ,params.wavelet,...
             'range'     ,params.range,...
@@ -262,6 +360,8 @@ att = struct('method'   ,params.method,...
             'options'   ,params.options,...
             'omegamode' ,params.omegamode);
 
+warning('on','all')
+        
 end
 
 %% function: fin_ml
@@ -272,13 +372,22 @@ function [d, sigma] = fin_ml(wsum, va, N, NJ, range, params)
     Js = J1:J2;
 
     wsize = N;
+    
+    %wsum = wsum/max(wsum(:));
 
     % initial parameters
     lb = params.lb(1);
     ub = params.ub(1);
 
-    sdf = bfn_finsdf(params.init(1),[J1,J2],NaN);
-    signew2 = sum(wsum(Js)./sdf)/wsize;     
+    dnew = params.init(1);
+    switch params.omegamode
+        case {'cov','lin'}
+            B1 = (1 - 2.^(2*dnew-1))./(1-2*dnew);  
+            signew2 = va/(2*B1*(2*pi)^(1-2*dnew)*sum(2.^((2*dnew-1)*(Js))));
+        case 'sdf'
+            sdf = bfn_finsdf(dnew,[J1,J2],NaN);
+            signew2 = sum(wsum(Js)./sdf)/wsize;
+    end
 
     % iteration
     it = 1;
@@ -286,11 +395,10 @@ function [d, sigma] = fin_ml(wsum, va, N, NJ, range, params)
     while ((abs(1-signew2/sigold2)>params.abstol)) && (it<=params.maxit) 
         sigold2 = signew2;
         if isempty(params.options)
-            options = optimset('Algorithm'      ,'trust-region-reflective',...
-                               'MaxFunEvals'    ,300,...
-                               'MaxIter'        ,50,...
-                               'TolFun'         ,1e-5,...
-                               'TolX'           ,1e-7,...
+            options = optimset('MaxFunEvals'    ,1000,...
+                               'MaxIter'        ,500,...
+                               'TolFun'         ,1e-10,...
+                               'TolX'           ,1e-10,...
                                'Diagnostics'    ,'off',...
                                'Display'        ,'off');
         else
@@ -301,10 +409,9 @@ function [d, sigma] = fin_ml(wsum, va, N, NJ, range, params)
         dnew = est(1);
 
         switch params.omegamode
-            case 'lin'
-            case 'cov'
+            case {'cov','lin'}
                 B1 = (1 - 2.^(2*dnew-1))./(1-2*dnew);    
-                signew2 = va/(2*B1*(2*pi)^(1-2*dnew)*sum(2.^((2*dnew-1)*(1:10))));
+                signew2 = va/(2*B1*(2*pi)^(1-2*dnew)*sum(2.^((2*dnew-1)*(Js))));
             case 'sdf'
                 sdf = bfn_finsdf(dnew,[J1,J2],NaN);
                 signew2 = sum(wsum(Js)./sdf)/wsize; 
@@ -319,8 +426,14 @@ function [d, sigma] = fin_ml(wsum, va, N, NJ, range, params)
         it = it+1;
     end
 
-    d = dnew;
-    sigma = signew2; 
+    if it>1
+        d = dnew;
+        sigma = signew2; 
+    else
+        d = NaN;
+        sigma = NaN;
+    end
+    
 end
 
 %% function : fin_mr
@@ -340,9 +453,8 @@ function [d, sigma] = fin_mr(wsum, va, N, NJ, range, params)
     if isempty(params.options)
         options = optimset('MaxFunEvals'    ,300,...
                            'MaxIter'        ,50,...
-                           'TolFun'         ,1e-5,...
-                           'TolX'           ,1e-7,...
-                           'Algorithm'      ,'trust-region-reflective',...
+                           'TolFun'         ,1e-10,...
+                           'TolX'           ,1e-10,...
                            'Diagnostics'    ,'off',...
                            'Display'        ,'off');                      
     else
@@ -358,7 +470,7 @@ function [d, sigma] = fin_mr(wsum, va, N, NJ, range, params)
             sigma = sum(wsum(Js)./sdf)/wsize; 
         case 'cov'            
             B1    = (1 - 2.^(2*d-1))./(1-2*d);    
-            sigma = va/(2*B1*(2*pi)^(1-2*d)*sum(2.^((2*d-1)*(1:10))));
+            sigma = va/(2*B1*(2*pi)^(1-2*d)*sum(2.^((2*d-1)*(Js))));
     end                      
 end
 

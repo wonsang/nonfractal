@@ -43,6 +43,7 @@ function [H, nfcor, fcor, att] = bfn_mfin_lms(X, varargin)
 %     'cov' - based on the covariance.
 %   verbose - whether to display the text messages during
 %                   processing. Default is 1.
+%   d_only - only estimate the Hurst exponents (H).
 %   isplot - whether display the plot. The plot is not displayed 
 %                   if isplot equal to 0. Default is 1.
 %
@@ -66,6 +67,8 @@ function [H, nfcor, fcor, att] = bfn_mfin_lms(X, varargin)
 % $ Id: bfn_mfin_lms.m 0028 2013-03-12 00:13:18 brainfnet $
 % Copyright (c) 2011 Brainfnet.
 
+warning('off','all')
+
 params = struct('method'        ,'US',...
                 'wavelet'       ,'dwt',...
                 'filter'        ,'la8',...
@@ -74,7 +77,8 @@ params = struct('method'        ,'US',...
                 'fixMaxScale'   ,0,...
                 'minScaleRange' ,2,...  
                 'maxerr'        ,1e-1,...
-                'omegamode'     ,'sdf',...
+                'omegamode'     ,'cov',...
+                'd_only'        ,0,...
                 'verbose'       ,1,...
                 'isplot'        ,0);
 if nargin > 1
@@ -111,57 +115,121 @@ switch params.wavelet
                 W{j}(1:NJ(j),q) = x_bw{j}; %x_dwt for biased
             end
         end 
+        
+    case 'modwt'
+        
+        x_dwt = modwt(X(:,1), params.filter, 'conservative', 'circular');
+        
+        N     = size(x_dwt,1);
+        J     = size(x_dwt,2);
+        
+        Jmax  = floor(log2(size(X,1)));
+        NJ    = 2.^(Jmax-1:-1:Jmax-J);
+        
+        x_bw  = bfn_modwt_brick_wall(x_dwt, params.filter, N);
+
+        W = cell(1,J);
+        for j=1:J
+            W{j} = zeros(N,Q);
+            W{j}(:,1) = squeeze(x_bw(:,j));  
+        end
+        
+        for q=2:Q
+            x_dwt = modwt(X(:,q), params.filter, 'conservative', 'circular');
+            x_bw  = bfn_modwt_brick_wall(x_dwt, params.filter, N);
+            for j=1:J
+                W{j}(:,q) = squeeze(x_bw(:,j));
+            end
+        end 
+
     otherwise
 end
 
-J1 = params.range(1);
-J2 = min(J,params.range(2));
+J1 = max(1,params.range(1));
+J2 = min(J,params.range(2));  
 Js = J1:J2;
 
 % wavelet variances
 switch params.wavelet
-    case {'dwt','dwt-ext'}
+    case {'dwt'}
+        %{
         wvar = zeros(J,Q);
         for q = 1:Q
             Wq = getWq(W,q);
             wvar(:,q) = bfn_wave_var_dwt(Wq, N);
         end
+        %}
 
-        wcov = zeros(J,Q,Q);
-        wcor = zeros(J,Q,Q);
-        for q1 = 1:Q-1
-            for q2 = q1+1:Q
-                W1 = getWq(W,q1);
-                W2 = getWq(W,q2);
+        %if ~params.d_only
+            wcov = zeros(J,Q,Q);
+            %wcor = zeros(J,Q,Q);
+            for q1 = 1:Q
+                for q2 = q1:Q
+                    W1 = getWq(W,q1);
+                    W2 = getWq(W,q2);
 
-                wcov(:,q1,q2) = bfn_wave_cov_dwt(W1, W2);
-                wcor(:,q1,q2) = bfn_wave_cor_dwt(W1, W2, N);
+                    wcov(:,q1,q2) = bfn_wave_cov_dwt(W1, W2);
+                    %wcor(:,q1,q2) = bfn_wave_cor_dwt(W1, W2, N);
 
-                wcov(:,q2,q1) = wcov(:,q1,q2);
-                wcor(:,q2,q1) = wcor(:,q1,q2);
-            end
-        end
-
-        for q = 1:Q
-            wcov(:,q,q) = wvar(:,q);
-            wcor(:,q,q) = 1;
-        end 
-
-        % wsum
-        switch params.omegamode
-            case {'cov','sdf'}
-                wsum = zeros(J,Q,Q);
-                for q1 = 1:Q
-                    for q2 = q1:Q
-                        W1 = getWq(W,q1);
-                        W2 = getWq(W,q2);
-
-                        wsum(:,q1,q2) = bfn_wave_sum_dwt(W1, W2);
-                        wsum(:,q2,q1) = wsum(:,q1,q2);
-                    end
+                    wcov(:,q2,q1) = wcov(:,q1,q2);
+                    %wcor(:,q2,q1) = wcor(:,q1,q2);
                 end
-            otherwise
+            end
+
+            %{
+            for q = 1:Q
+                wcov(:,q,q) = wvar(:,q);
+                wcor(:,q,q) = 1;
+            end 
+            %}
+
+            % wsum
+            switch params.omegamode
+                case {'cov','sdf'}
+                    wsum = zeros(J,Q,Q);
+                    for q1 = 1:Q
+                        for q2 = q1:Q
+                            W1 = getWq(W,q1);
+                            W2 = getWq(W,q2);
+
+                            wsum(:,q1,q2) = bfn_wave_sum_dwt(W1, W2);
+                            wsum(:,q2,q1) = wsum(:,q1,q2);
+                        end
+                    end
+                otherwise
+            end
+        %end
+        
+    case {'modwt'}
+        
+        %wvar = zeros(J,Q);
+        wcov = zeros(J,Q,Q);
+        %wcor = zeros(J,Q,Q);
+        wsum = zeros(J,Q,Q);
+        for q1 = 1:Q
+            W1 = getWq(W,q1);
+            W1 = cell2mat(W1);
+            %wvar(:,q1,q1) = modwt_wvar(W1,'chi2eta3','unbiased',params.filter);
+            %wcov(:,q1,q1) = wvar(:,q1,q1);
+            %wcor(:,q1,q1) = 1;
+            %wsum(:,q1)    = wvar(:,q1,q1);
+
+            %if ~params.d_only
+                for q2 = q1:Q
+                    %if q1 ~= q2
+                        W2 = getWq(W,q2);
+                        W2 = cell2mat(W2);
+                        wcov(:,q1,q2) = modwt_wcov(W1, W2,'gaussian','unbiased',params.filter);
+                        wcov(:,q2,q1) = wcov(:,q1,q2);
+                        %wcor(:,q1,q2) = modwt_wcor(W1, W2);
+                        %wcor(:,q2,q1) = wcor(:,q1,q2);
+                        wsum(:,q1,q2) = wcov(:,q1,q2);
+                        wsum(:,q2,q1) = wsum(:,q1,q2);
+                    %end
+                end
+            %end
         end
+
     otherwise
 end
 
@@ -336,6 +404,8 @@ att = struct('method'       ,params.method,...
             'par'           ,par,...
             'lsq'           ,lmsNorm);
 
+warning('on','all')
+        
 end
 
 function Wq = getWq(W,q)

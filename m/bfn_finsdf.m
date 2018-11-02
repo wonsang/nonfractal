@@ -29,15 +29,15 @@ function sdf = bfn_finsdf(d, range, SNR)
 
 Js   = (range(1):range(2))';
 
-dsum = 2*d;    
+dd = 2*d;    
 
-B1   = (1 - 2^(dsum-1))/(1-dsum);
-B3   = (1 - 2^(dsum-3))/(3-dsum);
+B1   = (1 - 2^(dd-1))/(1-dd);
+B3   = (1 - 2^(dd-3))/(3-dd);
 A    = d/12;   
 a2   = (2*pi)^2*A*B3/B1;
-K    = 2*B1*(2*pi)^(-2*d);
+K    = 2*B1*(2*pi)^(-dd);
 
-sdf  = K*2.^(Js*dsum).*(1 + a2./(2.^(2*Js)));
+sdf  = K*2.^(Js*dd).*(1 + a2./(2.^(2*Js)));
 
 if ~isnan(SNR)   
     varRatio = 10^(-SNR/10);
